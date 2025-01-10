@@ -1,0 +1,118 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <math.h>
+
+// Define a structure to represent a point in 2D space
+typedef struct {
+    double x;
+    double y;
+} Point;
+
+// Function to calculate the distance between two points
+double distance(Point p1, Point p2) {
+    return sqrt(pow(p2.x - p1.x, 2) + pow(p2.y - p1.y, 2));
+}
+
+// Function to find the closest pair of points using brute force
+void closest_pair_brute_force(Point points[], int n, double *min_distance) {
+    *min_distance = INFINITY;
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = i + 1; j < n; j++) {
+            double dist = distance(points[i], points[j]);
+            if (dist < *min_distance) {
+                *min_distance = dist;
+            }
+        }
+    }
+}
+
+// Function to compare points based on x-coordinates
+int compare_x(const void *a, const void *b) {
+    Point *p1 = (Point *)a;
+    Point *p2 = (Point *)b;
+    return (p1->x - p2->x);
+}
+
+// Function to compare points based on y-coordinates
+int compare_y(const void *a, const void *b) {
+    Point *p1 = (Point *)a;
+    Point *p2 = (Point *)b;
+    return (p1->y - p2->y);
+}
+
+// Function to find the closest pair of points using divide and conquer
+double closest_pair_divide_conquer(Point points[], int n) {
+    // Base case: 3 or fewer points
+    if (n <= 3) {
+        double min_distance = INFINITY;
+        closest_pair_brute_force(points, n, &min_distance);
+        return min_distance;
+    }
+
+    // Divide: Find the middle point
+    int mid = n / 2;
+    Point mid_point = points[mid];
+
+    // Divide: Create two subarrays
+    Point left[mid];
+    Point right[n - mid];
+    for (int i = 0; i < mid; i++) {
+        left[i] = points[i];
+    }
+    for (int i = mid; i < n; i++) {
+        right[i - mid] = points[i];
+    }
+    // Recursively find the closest distances in each subarray
+    double dl = closest_pair_divide_conquer(left, mid);
+    double dr = closest_pair_divide_conquer(right, n - mid);
+    double d = fmin(dl, dr);
+
+    // Create a strip of points within 2*d of the middle line
+    Point strip[n];
+    int j = 0;
+    for (int i = 0; i < n; i++) {
+        if (fabs(points[i].x - mid_point.x) < d) {
+            strip[j++] = points[i];
+        }
+    }
+
+    // Sort the strip by y-coordinate
+    qsort(strip, j, sizeof(Point), compare_y);
+
+    // Find the closest distance within the strip
+    for (int i = 0; i < j - 1; i++) {
+        for (int k = i + 1; k < j && (strip[k].y - strip[i].y) < d; k++) {
+            double dist = distance(strip[i], strip[k]);
+            if (dist < d) {
+                d = dist;
+            }
+        }
+    }
+
+    return d;
+}
+int main() {
+    int n;
+    printf("Enter the number of points: ");
+    scanf("%d", &n);
+
+    Point points[n];
+    printf("Enter the coordinates of the points:\n");
+    for (int i = 0; i < n; i++) {
+        scanf("%lf %lf", &points[i].x, &points[i].y);
+    }
+
+    // Sort the points by x-coordinate
+    qsort(points, n, sizeof(Point), compare_x);
+
+    double min_distance_brute_force;
+    closest_pair_brute_force(points, n, &min_distance_brute_force);
+    printf("Minimum distance (brute force): %.2lf\n", min_distance_brute_force);
+
+    double min_distance_divide_conquer = closest_pair_divide_conquer(points, n);
+    printf("Minimum distance (divide and conquer): %.2lf\n", min_distance_divide_conquer);
+
+    return 0;
+}

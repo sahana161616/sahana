@@ -1,0 +1,570 @@
+1)	Two sum
+#include <stdlib.h>
+
+int* twoSum(int* nums, int numsSize, int target, int* returnSize) {
+    int *result = (int*)malloc(2 * sizeof(int));
+    *returnSize = 2;
+
+    for (int i = 0; i < numsSize; i++) {
+        for (int j = i + 1; j < numsSize; j++) {
+
+            if (nums[i] + nums[j] == target) {
+                result[0] = i;
+                result[1] = j;
+                return result; 
+            }
+        }
+    }
+
+    
+    *returnSize = 0;
+    return NULL;
+}
+
+
+2)	plaindrome
+#include <stdbool.h>
+#include <limits.h> // 
+
+bool isPalindrome(int x) {
+    if (x < 0 || (x != 0 && x % 10 == 0)) {
+        return false;
+    }
+
+    int reversed = 0;
+    int original = x;
+
+    while (x > 0) {
+        int digit = x % 10;
+
+        if (reversed > (INT_MAX - digit) / 10) {
+            return false; 
+        }
+
+        reversed = reversed * 10 + digit;
+        x /= 10;
+    }
+    return reversed == original;
+}
+
+
+3)	Roman to integer 
+#include <string.h>
+
+int romanToInt(char* s) {
+    int romanValues[256] = {0}; 
+    romanValues['I'] = 1;
+    romanValues['V'] = 5;
+    romanValues['X'] = 10;
+    romanValues['L'] = 50;
+    romanValues['C'] = 100;
+    romanValues['D'] = 500;
+    romanValues['M'] = 1000;
+
+    int result = 0;
+    int length = strlen(s);
+
+    for (int i = 0; i < length; i++) {
+        if (i + 1 < length && romanValues[s[i]] < romanValues[s[i + 1]]) {
+            result -= romanValues[s[i]];
+        } else {
+            result += romanValues[s[i]];
+        }
+    }
+
+    return result; 
+
+4. longest common prefix
+#include <string.h>
+#include <stdlib.h>
+
+char* longestCommonPrefix(char** strs, int strsSize) {
+    if (strsSize == 0) {
+        return ""; // No strings, return empty string
+    }
+
+    // Use the first string as the initial prefix
+    char* prefix = strs[0];
+    int prefixLength = strlen(prefix);
+
+    // Iterate through the strings in the array
+    for (int i = 1; i < strsSize; i++) {
+        int j = 0;
+        // Compare characters of the prefix with the current string
+        while (j < prefixLength && strs[i][j] != '\0' && strs[i][j] == prefix[j]) {
+            j++;
+        }
+        // Update the prefix length to the common prefix length
+        prefixLength = j;
+
+        // If the prefix becomes empty, return an empty string
+        if (prefixLength == 0) {
+            return "";
+        }
+    }
+
+    // Create a result string with the common prefix
+    char* result = (char*)malloc((prefixLength + 1) * sizeof(char));
+    strncpy(result, prefix, prefixLength);
+    result[prefixLength] = '\0'; // Null-terminate the result string
+
+    return result;
+}
+
+
+5. valid parentheses
+
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+
+bool isValid(char* s) {
+    int n = strlen(s);
+    if (n % 2 != 0) {
+        return false; // Odd length can't have valid pairs
+    }
+
+    // Stack to store open brackets
+    char* stack = (char*)malloc(n * sizeof(char));
+    int top = -1;
+
+    for (int i = 0; i < n; i++) {
+        char c = s[i];
+        if (c == '(' || c == '{' || c == '[') {
+            // Push open brackets onto the stack
+            stack[++top] = c;
+        } else {
+            // Check for matching open brackets
+            if (top == -1) {
+                free(stack);
+                return false; // No open bracket to match
+            }
+            char topChar = stack[top--];
+            if ((c == ')' && topChar != '(') ||
+                (c == '}' && topChar != '{') ||
+                (c == ']' && topChar != '[')) {
+                free(stack);
+                return false; // Mismatched brackets
+            }
+        }
+    }
+
+    // If the stack is empty, all brackets matched correctly
+    bool isValid = (top == -1);
+    free(stack);
+    return isValid;
+}
+
+
+6. merge 2 sorted list
+struct ListNode* mergeTwoLists(struct ListNode* list1, struct ListNode* list2) {
+    // Use a dummy node to simplify list merging
+    struct ListNode dummy;
+    struct ListNode* tail = &dummy; // Tail pointer to track the last node in the merged list
+    dummy.next = NULL;
+
+    // Merge the lists
+    while (list1 && list2) {
+        if (list1->val <= list2->val) {
+            tail->next = list1; // Append list1 node
+            list1 = list1->next; // Move list1 pointer forward
+        } else {
+            tail->next = list2; // Append list2 node
+            list2 = list2->next; // Move list2 pointer forward
+        }
+        tail = tail->next; // Move the tail pointer forward
+    }
+
+    // Append any remaining nodes
+    if (list1) {
+        tail->next = list1;
+    } else {
+        tail->next = list2;
+    }
+
+    return dummy.next; // Return the merged list starting from dummy.next
+}
+
+
+7. remove duplicates from sorted array
+
+int removeDuplicates(int* nums, int numsSize) {
+    if (numsSize == 0) return 0; 
+
+    int k = 1; 
+
+    for (int i = 1; i < numsSize; i++) {
+        if (nums[i] != nums[k - 1]) { 
+            nums[k] = nums[i]; 
+            k++; 
+        }
+    }
+
+    return k; 
+}
+
+8. remove element
+
+int removeElement(int* nums, int numsSize, int val) {
+    int k = 0; // Counter for elements not equal to val
+
+    for (int i = 0; i < numsSize; i++) {
+        if (nums[i] != val) {
+            nums[k] = nums[i]; // Place the element in the next available position
+            k++; // Increment the count of valid elements
+        }
+    }
+
+    return k; // Return the number of elements not equal to val
+}
+
+9. find the index of first occurrence un string
+
+int strStr(char* haystack, char* needle) {
+    if (*needle == '\0') return 0;
+
+    int haystackLen = 0, needleLen = 0;
+
+    while (haystack[haystackLen] != '\0') haystackLen++;
+    while (needle[needleLen] != '\0') needleLen++;
+
+    if (needleLen > haystackLen) return -1;
+
+    for (int i = 0; i <= haystackLen - needleLen; i++) {
+        int j = 0;
+        while (j < needleLen && haystack[i + j] == needle[j]) {
+            j++;
+        }
+        if (j == needleLen) return i;
+    }
+
+    return -1;
+}
+
+10. search insert position
+
+
+int searchInsert(int* nums, int numsSize, int target) {
+    int left = 0, right = numsSize - 1;
+
+    while (left <= right) {
+        int mid = left + (right - left) / 2;  
+        if (nums[mid] == target) {
+            return mid;  
+        } else if (nums[mid] < target) {
+            left = mid + 1;  
+        } else {
+            right = mid - 1;  
+        }
+    }
+
+    return left;  
+}
+
+11. length of last word
+
+int lengthOfLastWord(char* s) {
+    int length = 0;
+    int i = strlen(s) - 1;  
+
+    while (i >= 0 && s[i] == ' ') {
+        i--;
+    }
+
+    while (i >= 0 && s[i] != ' ') {
+        length++;
+        i--;
+    }
+
+    return length;
+}
+
+12. plus 1 
+#include <stdio.h>
+
+int* plusOne(int* digits, int digitsSize, int* returnSize) {
+    for (int i = digitsSize - 1; i >= 0; i--) {
+        if (digits[i] < 9) {
+            digits[i]++;  
+            *returnSize = digitsSize;  
+            return digits;
+        }
+        digits[i] = 0;  
+    }
+
+    *returnSize = digitsSize + 1;
+    int* result = (int*)malloc((*returnSize) * sizeof(int));
+    result[0] = 1;  
+    for (int i = 1; i < *returnSize; i++) {
+        result[i] = 0;  
+    }
+    
+    return result;
+}
+
+13. add binary
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+char* addBinary(char* a, char* b) {
+    int lenA = strlen(a);
+    int lenB = strlen(b);
+    int maxLength = lenA > lenB ? lenA : lenB;  
+    
+    char* result = (char*)malloc((maxLength + 2) * sizeof(char));
+    int carry = 0;  
+    int index = 0;  
+
+    while (lenA > 0 || lenB > 0 || carry) {
+        int sum = carry;  
+        
+        if (lenA > 0) {
+            sum += a[lenA - 1] - '0';  
+            lenA--;
+        }
+        
+        if (lenB > 0) {
+            sum += b[lenB - 1] - '0';  
+            lenB--;
+        }
+        
+        result[index++] = (sum % 2) + '0';  
+        carry = sum / 2;  
+    }
+
+    result[index] = '\0';  
+
+    for (int i = 0; i < index / 2; i++) {
+        char temp = result[i];
+        result[i] = result[index - 1 - i];
+        result[index - 1 - i] = temp;
+    }
+
+    return result;
+}
+
+13. sqrt(x)
+
+#include <stdio.h>
+
+int mySqrt(int x) {
+    if (x == 0) return 0;
+    long long left = 1, right = x, mid, result;
+    while (left <= right) {
+        mid = left + (right - left) / 2;
+        if (mid * mid == x) return (int)mid;
+        if (mid * mid < x) {
+            result = mid;
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+    return (int)result;
+}
+
+14 . climbing stairs
+
+#include <stdio.h>
+
+int climbStairs(int n) {
+    if (n <= 2) return n;
+    int first = 1, second = 2, third;
+    for (int i = 3; i <= n; i++) {
+        third = first + second;
+        first = second;
+        second = third;
+    }
+    return second;
+}
+
+16. remove duplicates from sorted list
+
+#include <stdio.h>
+#include <stdlib.h>
+
+struct ListNode* deleteDuplicates(struct ListNode* head) {
+    struct ListNode *current = head;
+    while (current != NULL && current->next != NULL) {
+        if (current->val == current->next->val) {
+            struct ListNode* temp = current->next;
+            current->next = current->next->next;
+            free(temp);
+        } else {
+            current = current->next;
+        }
+    }
+    return head;
+}
+
+17.binary tree 
+
+void inorderTraversalHelper(struct TreeNode* root, int* result, int* returnSize) {
+    if (root == NULL) {
+        return;
+    }
+
+    inorderTraversalHelper(root->left, result, returnSize);
+    
+    result[*returnSize] = root->val;  // A
+    (*returnSize)++;  
+
+    inorderTraversalHelper(root->right, result, returnSize);
+}
+
+int* inorderTraversal(struct TreeNode* root, int* returnSize) {
+    int* result = (int*)malloc(1000 * sizeof(int));  
+    *returnSize = 0;  
+    inorderTraversalHelper(root, result, returnSize);
+    return result; 
+}
+18. same tree
+
+#include <stdbool.h>
+
+bool isSameTree(struct TreeNode* p, struct TreeNode* q) {
+    if (p == NULL && q == NULL) {
+        return true;
+    }
+    if (p == NULL || q == NULL) {
+        return false;
+    }
+    if (p->val != q->val) {
+        return false;
+    }
+    return isSameTree(p->left, q->left) && isSameTree(p->right, q->right);
+}
+19.Symmetric tree 
+#include <stdbool.h>
+
+bool isSymmetricHelper(struct TreeNode* left, struct TreeNode* right) {
+    if (left == NULL && right == NULL) {
+        return true;
+    }
+    if (left == NULL || right == NULL) {
+        return false;
+    }
+    if (left->val != right->val) {
+        return false;
+    }
+    return isSymmetricHelper(left->left, right->right) && isSymmetricHelper(left->right, right->left);
+}
+
+bool isSymmetric(struct TreeNode* root) {
+    if (root == NULL) {
+        return true;
+    }
+    return isSymmetricHelper(root->left, root->right);
+}
+20. maximum dept of binary tree
+
+#include <stddef.h>
+
+int maxDepth(struct TreeNode* root) {
+    if (root == NULL) {
+        return 0;
+    }
+    int leftDepth = maxDepth(root->left);
+    int rightDepth = maxDepth(root->right);
+    
+    return (leftDepth > rightDepth ? leftDepth : rightDepth) + 1;
+}
+21. convert sorted array to binary search tree
+struct TreeNode* sortedArrayToBSTHelper(int* nums, int left, int right) {
+    if (left > right) {
+        return NULL;
+    }
+    
+    int mid = left + (right - left) / 2;
+    
+    struct TreeNode* node = (struct TreeNode*)malloc(sizeof(struct TreeNode));
+    node->val = nums[mid];
+    node->left = sortedArrayToBSTHelper(nums, left, mid - 1);  
+    node->right = sortedArrayToBSTHelper(nums, mid + 1, right); 
+    
+    return node;
+}
+
+struct TreeNode* sortedArrayToBST(int* nums, int numsSize) {
+    return sortedArrayToBSTHelper(nums, 0, numsSize - 1);
+}
+22. balanced binary tree
+#include <stdbool.h>
+#include <stdlib.h>
+
+int height(struct TreeNode* root, bool* isBalanced) {
+    if (root == NULL) {
+        return 0;
+    }
+    int leftHeight = height(root->left, isBalanced);
+    if (!(*isBalanced)) return 0; 
+
+    int rightHeight = height(root->right, isBalanced);
+    if (!(*isBalanced)) return 0; 
+
+    if (abs(leftHeight - rightHeight) > 1) {
+        *isBalanced = false;
+    }
+
+    return 1 + (leftHeight > rightHeight ? leftHeight : rightHeight);
+}
+
+bool isBalanced(struct TreeNode* root) {
+    bool isBalancedFlag = true;
+    height(root, &isBalancedFlag);
+    return isBalancedFlag;
+}
+23. pascals triangle
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int** generate(int numRows, int* returnSize, int** returnColumnSizes) {
+    int** triangle = (int**)malloc(numRows * sizeof(int*));
+    *returnColumnSizes = (int*)malloc(numRows * sizeof(int));
+
+    for (int i = 0; i < numRows; i++) {
+        triangle[i] = (int*)malloc((i + 1) * sizeof(int));
+        (*returnColumnSizes)[i] = i + 1;  
+
+        triangle[i][0] = 1;
+        triangle[i][i] = 1;
+
+        for (int j = 1; j < i; j++) {
+            triangle[i][j] = triangle[i - 1][j - 1] + triangle[i - 1][j];
+        }
+    }
+
+    *returnSize = numRows;
+    return triangle;
+}
+24.  single number
+
+int singleNumber(int* nums, int numsSize) {
+    int result = 0;
+    for (int i = 0; i < numsSize; i++) {
+        result ^= nums[i];  
+    }
+    return result;
+}
+25. linked list cycle
+
+bool hasCycle(struct ListNode *head) {
+    struct ListNode *tortoise = head;
+    struct ListNode *hare = head;
+    
+    while (hare != NULL && hare->next != NULL) {
+        tortoise = tortoise->next;           
+        hare = hare->next->next;             
+        
+        if (tortoise == hare) {
+            return true;
+        }
+    }
+
+    
+    return false;
+}
+
